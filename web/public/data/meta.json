@@ -1,0 +1,44 @@
+{
+ "imported_at": "2026-10-06T15:04:17+07:00",
+ "molds_total": 799,
+ "by_type": {
+  "DIEP1": {
+   "total": 202,
+   "spare": 136,
+   "installed": 31,
+   "repair": 35,
+   "retired": 0
+  },
+  "PUNCHP1": {
+   "total": 216,
+   "spare": 163,
+   "installed": 40,
+   "repair": 12,
+   "retired": 1
+  },
+  "PUNCHP3": {
+   "total": 226,
+   "spare": 174,
+   "installed": 35,
+   "repair": 17,
+   "retired": 0
+  },
+  "DIEP3": {
+   "total": 155,
+   "spare": 110,
+   "installed": 41,
+   "repair": 3,
+   "retired": 1
+  }
+ },
+ "repairs_total": 2222,
+ "repairs_open": 183,
+ "repairs_linked": 959,
+ "repairs_orphan": 1263,
+ "patterns_total": 74,
+ "patterns_link": {
+  "exact": 54,
+  "prefix": 4,
+  "miss": 16
+ }
+}
