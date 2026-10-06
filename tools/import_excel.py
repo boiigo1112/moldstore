@@ -763,6 +763,35 @@ def apply_system_overlay(molds, repairs, orphans, st):
     return out, orphans
 
 
+def reconcile_open_repairs(molds, repairs, st):
+    """สถานะต้องสอดคล้องกับใบซ่อม: แม่พิมพ์ที่ผูกกับใบซ่อม open ต้องเป็น repair.
+
+    เรียกหลัง apply_system_overlay / ก่อน write_json+write_db เพื่อให้ JSON และ DB
+    ตรงกันทุกครั้งที่ import ใหม่ (กันไม่ให้ชีทสต็อกที่ลืมอัปเดตทำให้ข้อมูลเพี้ยนอีก)
+    - ข้ามแม่พิมพ์ที่แตะในระบบแล้ว (touched_molds: ระบบชนะ) แต่พิมพ์เตือนให้ตรวจ
+    """
+    open_codes = {}
+    for r in repairs:
+        if r.get("status") == "open":
+            for c in (r.get("link") or {}).get("linked_codes", []):
+                open_codes.setdefault(c, []).append(r["source_no"])
+    by_code = {m["code"]: m for m in molds}
+    fixed, skipped = 0, []
+    for code, papers in open_codes.items():
+        m = by_code.get(code)
+        if not m or m["status"] == "repair":
+            continue
+        if code in st["touched_molds"]:
+            skipped.append(code)
+            continue
+        m["status"] = "repair"
+        m["status_th"] = STATUS_TH.get("repair", "ส่งซ่อม")
+        fixed += 1
+    print(f"  reconcile: แก้สถานะเป็น repair {fixed} ตัว (ผูกกับใบซ่อมค้าง)")
+    if skipped:
+        print(f"  ! ข้าม {len(skipped)} ตัวที่แตะในระบบแล้ว ควรตรวจเอง: {', '.join(skipped[:10])}")
+
+
 def write_json(molds, repairs):
     os.makedirs(DATA_DIR, exist_ok=True)
     with io.open(os.path.join(DATA_DIR, "molds.json"), "w", encoding="utf-8") as fh:
@@ -856,6 +885,8 @@ def main():
     carry_registered(molds)
     st = load_wf_state()
     repairs, orphans = apply_system_overlay(molds, repairs, orphans, st)
+    print("ตรวจสอบสถานะกับใบซ่อมค้าง...")
+    reconcile_open_repairs(molds, repairs, st)
     print("อ่าน master รหัสแบบ...")
     patterns = parse_patterns(wb)
     with io.open(os.path.join(DATA_DIR, "patterns.json"), "w", encoding="utf-8") as fh:
