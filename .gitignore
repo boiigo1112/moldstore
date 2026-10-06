@@ -1,0 +1,26 @@
+# dependencies
+web/node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# build output (reproducible via npm run build)
+web/dist/
+
+# real databases - never commit
+data/*.db
+data/*.db.bak
+dev-data/
+*.sqlite3
+
+# logs
+logs/
+
+# binaries live in the original Store1_0_t3zk.rar, not in git
+api/*.exe
+path/*.xlsm
+path/*.xlsx
+
+# OS
+.DS_Store
+Thumbs.db
